@@ -6,21 +6,30 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useState, useRef } from "react"
 import { X } from "lucide-react"
+import { queryG } from '../../types/qGem';
+import { queryGemini } from "@/app/lib/GeminiResponse/action"
+import { ResponseDisplay } from "../response/page"
 
 export function Chat() {
-  const [text, setText] = useState("")
-  const [preview, setPreview] = useState<string | null>(null)
-  const [fileName, setFileName] = useState<string | null>(null)
+  const [ text, setText ] = useState( "" )
+  const [ image64, setImage64 ] = useState< string | null >()
+  const [ preview, setPreview ] = useState< string | null >( null )
+  const [ fileName, setFileName ] = useState< string | null >( null )
+  const [ responseAi, setResponseAI ] = useState< string | null | undefined >( null )
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file : File | undefined = e.target.files?.[0]
+    const aux = await getBase64(file)
 
     if (file && file.type.startsWith("image/")) {
       const objectUrl = URL.createObjectURL(file)
       setPreview(objectUrl)
       setFileName(file.name)
+      setImage64(aux)
+      
     }
+
   }
 
   const removeImage = () => {
@@ -31,17 +40,49 @@ export function Chat() {
     }
   }
 
+ const getBase64 = (file: File | undefined): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    if (file !== undefined) {
+      reader.readAsDataURL(file);
+
+    reader.onload = () => {
+      // Cuando termina, resolvemos la promesa con el resultado
+      resolve(reader.result as string);
+    };
+
+    reader.onerror = (error) => {
+      // Si falla, rechazamos la promesa
+      reject(error);
+    };
+      
+    }
+    
+  });
+};
+
   const handleSubmit = async () => {
     if (!text.trim() && !preview) {
+
+      console.log(text)
+
       return
     }
 
+    const data : queryG = { query:text, image64, fileName }
+
     // Aquí puedes enviar los datos (text + image) a tu backend
-    console.log("Enviando:", { text, image: preview, fileName })
+    //console.log("Enviando:", data)
+
+    const response = await queryGemini(data)
+
+    setResponseAI(response)
 
     // Reset después de enviar
     setText("")
     removeImage()
+    setImage64("")
   }
 
   return (
@@ -108,6 +149,9 @@ export function Chat() {
           Enviar
         </Button>
       </div>
+      
+      <ResponseDisplay content={responseAi} />
+
     </div>
   )
 }
