@@ -76,7 +76,7 @@ export function Chat() {
     //console.log("Enviando:", data)
 
     const response = await queryGemini(data)
-
+    
     setResponseAI(response)
 
     // Reset después de enviar

@@ -14,7 +14,7 @@ export async function queryGemini( query : queryG ) {
     const promptParts = [];
 
     promptParts.push({ 
-      text: "Eres un experto en hardware y soporte técnico. Responde siempre en español. Sé claro, técnico y útil." 
+      text: "Eres un experto en hardware y soporte técnico. Responde siempre en español. Sé claro, técnico y útil, se muy conciso, solo di fecha de creación, datos importantes y ¿Cuanto se puede potenciar?." 
     });
 
     // A. Agregamos el texto (Siempre va)
