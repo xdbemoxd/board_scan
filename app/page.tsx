@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Chat } from "@/components/chat/page";
+import Home2 from "@/components/xd/page";
 
 export default function Home() {
   return (
@@ -19,6 +20,8 @@ export default function Home() {
           </h1>
 
           <Chat/>
+
+          <Home2/>
           
         </div>
       </main>

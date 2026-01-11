@@ -9,6 +9,7 @@ import { X } from "lucide-react"
 import { queryG } from '../../types/qGem';
 import { queryGemini } from "@/app/lib/GeminiResponse/action"
 import { ResponseDisplay } from "../response/page"
+import dbConnect from "@/app/lib/dbConnect"
 
 export function Chat() {
   const [ text, setText ] = useState( "" )
