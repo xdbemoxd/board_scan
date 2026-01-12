@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoginForm } from "@/components/auth/login-form"
 import Link from "next/link"
+import { Suspense } from "react"
+import { FormSkeleton } from "@/components/skeleton/formSkeleton/page"
 
 export default function LoginPage() {
   return (
@@ -11,7 +13,9 @@ export default function LoginPage() {
           <CardDescription>Accede a tu cuenta con tu correo y contraseña</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <LoginForm />
+          <Suspense fallback={<FormSkeleton />}>
+             <LoginForm />
+          </Suspense>
           <div className="text-center text-sm">
             <span className="text-slate-600">¿No tienes cuenta? </span>
             <Link href="/pages/register" className="font-semibold text-slate-900 hover:text-slate-700">
