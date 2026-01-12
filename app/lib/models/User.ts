@@ -6,6 +6,7 @@ export interface IUser {
   email: string;
   image?: string;
   create: Date;
+  password:string;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -14,6 +15,7 @@ const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true },
   image: { type: String, default: null },
   create: { type: Date, default: Date.now },
+  password: { type: String, required: true, select: false },
 }, {
   // 👇 ESTA ES LA LÍNEA MÁGICA QUE TE FALTA
   collection: 'USERS',
