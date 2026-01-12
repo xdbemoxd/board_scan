@@ -8,30 +8,71 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Eye, EyeOff, Upload } from "lucide-react"
 import Image from "next/image"
+import { registerUser } from "@/app/lib/userAction/actions"
+import { useActionState } from 'react';
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    name: "",
+    lastname: "",
     email: "",
     password: "",
     image: null as File | null,
   })
   const [imagePreview, setImagePreview] = useState<string>("")
-  const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [errorMessage, formAction, isPending] = useActionState(
+      registerUser,
+      undefined,
+    );
+  const [ image64, setImage64 ] = useState< string | null >()
+
+  const getBase64 = (file: File | undefined): Promise<string> => {
+    
+    return new Promise((resolve, reject) => {
+     
+      const reader = new FileReader();
+    
+      if (file !== undefined) {
+        reader.readAsDataURL(file);
+
+        reader.onload = () => {
+        // Cuando termina, resolvemos la promesa con el resultado
+          resolve(reader.result as string);
+        };
+
+        reader.onerror = (error) => {
+        // Si falla, rechazamos la promesa
+          reject(error);
+        };
+        
+      }
+    
+    });
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
   }
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
+    if (file !== null){
+      const aux = await getBase64(file) 
+      const base64Data = aux.includes(",") 
+        ? aux.split(",")[1] 
+        : aux;
+      setImage64(base64Data)
+      console.log(base64Data)
+    } 
+
     if (file) {
       setFormData((prev) => ({
         ...prev,
@@ -46,18 +87,10 @@ export function RegisterForm() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    // Aquí irá la lógica de registro
-    setTimeout(() => {
-      setIsLoading(false)
-      console.log("Register:", formData)
-    }, 1000)
-  }
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form action={formAction} className="space-y-4">
+      <input type="hidden" name="image64" value={image64 || ""} />
+
       {/* Carga de imagen */}
       <div className="space-y-2">
         <Label className="text-sm font-medium">Foto de Perfil</Label>
@@ -92,11 +125,11 @@ export function RegisterForm() {
           Nombre
         </Label>
         <Input
-          id="firstName"
-          name="firstName"
+          id="name"
+          name="name"
           type="text"
           placeholder="Juan"
-          value={formData.firstName}
+          value={formData.name}
           onChange={handleInputChange}
           required
           className="w-full"
@@ -110,10 +143,10 @@ export function RegisterForm() {
         </Label>
         <Input
           id="lastName"
-          name="lastName"
+          name="lastname"
           type="text"
           placeholder="Pérez"
-          value={formData.lastName}
+          value={formData.lastname}
           onChange={handleInputChange}
           required
           className="w-full"
@@ -164,8 +197,8 @@ export function RegisterForm() {
         </div>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? "Creando cuenta..." : "Crear Cuenta"}
+      <Button className="w-full" disabled={isPending}>
+        {isPending ? "Creando cuenta..." : "Crear Cuenta"}
       </Button>
     </form>
   )
