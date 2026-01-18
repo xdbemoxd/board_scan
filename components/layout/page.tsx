@@ -1,13 +1,19 @@
+"use server"
+
 import Link from "next/link"
 import Image from "next/image"
 import ButtonOut from "../buttonOut/page";
+import { auth } from "@/auth";
 
 interface UserHeaderProps {
   userName: string | undefined | null,
   userImage: string | null
 }
 
-export function UserHeader({ userName, userImage }: UserHeaderProps) {
+export async function UserHeader({ userName, userImage }: UserHeaderProps) {
+
+  const session = await auth()
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,6 +22,8 @@ export function UserHeader({ userName, userImage }: UserHeaderProps) {
           <Link href="/" className="font-bold text-lg text-slate-900">
             App
           </Link>
+
+          <Link href={`/dashboard/profile-edit/${session?.user?.email}`} className="font-bold text-lg text-slate-900">edit profile</Link>
 
           {/* User Info and Logout */}
           <div className="flex items-center gap-4">

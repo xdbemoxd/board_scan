@@ -38,7 +38,6 @@ export default async function SecontLayout({
 
         <UserHeader userName={userName} userImage={userImageSrc}/>
         
-        
         {children}
       </main>
     

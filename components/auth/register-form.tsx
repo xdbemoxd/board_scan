@@ -70,7 +70,6 @@ export function RegisterForm() {
         ? aux.split(",")[1] 
         : aux;
       setImage64(base64Data)
-      console.log(base64Data)
     } 
 
     if (file) {
